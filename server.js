@@ -41,20 +41,22 @@ app.post('/parse-recipe', async (req, res) => {
       .slice(0, 25000);
 
     const prompt = `
-Você é um assistente de culinária extremamente detalhista e prático. Como quem vai cozinhar não tem o vídeo na frente o tempo todo, a receita precisa ser explicada com riqueza de detalhes para não restar dúvida sobre o que fazer.
+Você é um assistente de culinária rigoroso e literal. Sua única função é extrair e organizar a receita usando EXCLUSIVAMENTE o que consta no conteúdo abaixo (descrição, texto da página, fala/transcrição ou referências visuais/de imagem presentes no texto).
 
-Analise o conteúdo extraído abaixo e gere uma receita completa seguindo TODAS estas regras:
-1. "title": Escreva o nome claro e específico do prato.
-2. "category": Indique em qual pasta/categoria o prato se encaixa melhor (por exemplo: "Petisco", "Almoço", "Janta", "Sobremesas", "Café da Manhã / Lanche").
-3. "ingredients": Liste TODOS os ingredientes necessários. Sempre que houver quantidade ou medida no conteúdo/vídeo/descrição, coloque exatamente essa quantidade. Quando não houver quantidade exata, coloque uma quantidade prática estimada e explique a forma e o preparo prévio de cada ingrediente (ex.: se o queijo deve ser ralado, picado em cubos ou fatiado; se a batata deve ser cozida e amassada ou ralada; se a carne/tempero deve ser picado fino, etc.). Inclua também ingredientes básicos ou de apoio necessários para o preparo (como sal, óleo, água ou farinha para dar liga), sinalizando quando for sugestão.
-4. "steps": Escreva o modo de preparo passo a passo de forma bem detalhada, clara e didática, como se estivesse ensinando alguém passo a passo na cozinha. Explique a forma de fazer cada etapa, o formato/tamanho das porções (por exemplo, como modelar em palitos, bolinhas ou porções), a textura/ponto esperado e os cuidados para não errar (como temperatura, tempo aproximado, não queimar ou não vazar o recheio). Quando algum detalhe ou medida não constar explicitamente no material, preencha com uma técnica ou medida padrão de cozinha e deixe indicado que é uma sugestão para ajustar ao gosto.
+REGRAS ESTRITAS CONTRA INVENÇÃO:
+1. NUNCA invente ingredientes, quantidades ou receitas que não estejam no conteúdo (por exemplo, se o conteúdo for de bolo, jamais invente estrogonofe ou ingredientes que não aparecem).
+2. Não adicione ingredientes extras "por conta própria" nem assuma itens ausentes. Se um ingrediente ou quantidade não aparecer no conteúdo, escreva exatamente que não foi informado no conteúdo em vez de inventar.
+3. "title": Coloque o nome exato ou mais fiel possível da receita encontrada no conteúdo.
+4. "category": Sugira uma pasta (ex.: "Petisco", "Almoço", "Janta", "Sobremesas", "Lanche") apenas se fizer sentido com o prato encontrado; se não der para saber com segurança, use "Geral".
+5. "ingredients": Liste APENAS os ingredientes mencionados no conteúdo, mantendo as quantidades exatas e o modo/forma de preparo ou apresentação (ex.: ralado, picado, fatiado, derretido, etc.) apenas quando isso constar no conteúdo. Se a quantidade ou forma não estiver clara no conteúdo, indique explicitamente que não foi especificada no material.
+6. "steps": Descreva o modo de preparo detalhado e claro com base APENAS nas ações, falas, descrições ou informações visuais presentes no conteúdo. Não acrescente etapas inventadas que não estejam apoiadas no material. Se o conteúdo for insuficiente ou vazio, deixe isso claro nos passos em vez de criar uma receita fictícia.
 
 Responda APENAS com um JSON válido neste formato exato:
 {
-  "title": "Nome do prato",
-  "category": "Pasta sugerida (ex.: Petisco, Almoço, Janta, Sobremesas)",
-  "ingredients": ["ingrediente 1 com quantidade e forma/preparo", "ingrediente 2 com quantidade e forma/preparo"],
-  "steps": ["passo 1 detalhado", "passo 2 detalhado"]
+  "title": "Nome da receita",
+  "category": "Pasta sugerida",
+  "ingredients": ["ingrediente exatamente como consta no conteúdo"],
+  "steps": ["passo 1 baseado apenas no conteúdo", "passo 2 baseado apenas no conteúdo"]
 }
 
 Conteúdo extraído:
